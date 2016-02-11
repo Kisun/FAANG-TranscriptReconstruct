@@ -5,8 +5,10 @@
 ## Author: Kisun Pokharel (kisun.pokharel@helsinki.fi)
 ##
 ####################################################################
-
-mkdir -p results/fastqc-pretrim #Just to make sure, the quality of the data is fine and not adapters are present
+mkdir -p rawdata
+mkdir -p reference/annotation
+mkdir -p reference/genome
+mkdir -p results/fastqc-pretrim #Just to make sure, the quality of the data is fine and no adapters are present
 mkdir -p results/trimmomatic #If data needs to be trimmed
 mkdir -p results/fastqc-posttrim 
 mkdir -p results/tophat
@@ -30,21 +32,21 @@ echo $Bowtie2Build
 
 #Run Fastqc on raw fastq files
 ##change the --array value based on number of samples, this can be included directly in .sh file
-Fastqc1=$(sbatch fastqc_pretrim.sh -d afterok:$Data --array=1-30| cut -f 4 -d' ') 
+Fastqc1=$(sbatch fastqc_pretrim.sh -d afterok:$Data | cut -f 4 -d' ') 
 echo $Fastqc1
 
 #Run Trimmomatic
-Trimmomatic=$(sbatch -d afterok:$Fastqc1 trimmomatic.sh --array=1-30| cut -f 4 -d' ')
+Trimmomatic=$(sbatch -d afterok:$Fastqc1 trimmomatic.sh | cut -f 4 -d' ')
 echo $Trimmomatic
 
 #Run Fastqc on trimmed data
-Fastqc2=$(sbatch -d afterok:$Trimmomatic fastqc_posttrim.sh --array=1-30| cut -f 4 -d' ')
+Fastqc2=$(sbatch -d afterok:$Trimmomatic fastqc_posttrim.sh | cut -f 4 -d' ')
 echo $Fastqc2
 
 #Run Tophat2
-Tophat2=$(sbatch -d afterok:$Fastqc2:$Bowtie2Build tophat2.sh --array=1-30| cut -f 4 -d' ')
+Tophat2=$(sbatch -d afterok:$Fastqc2:$Bowtie2Build tophat2.sh | cut -f 4 -d' ')
 echo $Tophat2
 
 #Run Cufflinks
-Cufflinks=$(sbatch -d afterok:$Tophat2 cufflinks.sh --array=1-30| cut -f 4 -d' ')
+Cufflinks=$(sbatch -d afterok:$Tophat2 cufflinks.sh | cut -f 4 -d' ')
 echo $Cufflinks
