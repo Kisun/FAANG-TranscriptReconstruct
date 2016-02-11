@@ -30,7 +30,7 @@ echo $Bowtie2Build
 
 #Run Fastqc on raw fastq files
 ##change the --array value based on number of samples, this can be included directly in .sh file
-Fastqc1=$(sbatch fastqc_pretrim.sh --array=1-30| cut -f 4 -d' ') 
+Fastqc1=$(sbatch fastqc_pretrim.sh -d afterok:$Data --array=1-30| cut -f 4 -d' ') 
 echo $Fastqc1
 
 #Run Trimmomatic
